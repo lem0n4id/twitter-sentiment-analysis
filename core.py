@@ -1,4 +1,5 @@
 import pandas as pd
+from sentiment_analysis import perform_sentiment_analysis
 
 def get_tweets()->pd.DataFrame:
     """
@@ -44,3 +45,17 @@ def filter_unwanted_tweets(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
 
     return pd.DataFrame(filtered_tweets)
 
+def get_df(datetime:str='2021-09-30 00:13:26+00:00',stock:str='TSLA',next_x_hours:int=24)->pd.DataFrame:
+    try:
+        df=get_tweets()
+        TSLA_tweets_specified=tweets_within_hours(df, datetime=datetime, stock_name=stock, next_x_hours=next_x_hours)
+        TSLA_tweets_filtered=filter_unwanted_tweets(TSLA_tweets_specified, ticker=stock)
+        TSLA_tweets_sentiments=perform_sentiment_analysis(TSLA_tweets_filtered)
+        print("Success")
+        x=True
+        return TSLA_tweet_sentiments
+    except Exception as e:
+        # if loading the model fails
+        TSLA_tweet_sentiments = pd.read_csv("TSLA tweets score.csv",parse_dates=['Date'], index_col=['Date'])
+        x=False
+        return TSLA_tweet_sentiments
