@@ -1,5 +1,7 @@
 import pandas as pd
 from sentiment_analysis import perform_sentiment_analysis
+import yfinance as yf
+from datetime import datetime, timedelta
 
 def get_tweets()->pd.DataFrame:
     """
@@ -59,3 +61,27 @@ def get_df(datetime:str='2021-09-30 00:13:26+00:00',stock:str='TSLA',next_x_hour
         TSLA_tweet_sentiments = pd.read_csv("TSLA tweets score.csv",parse_dates=['Date'], index_col=['Date'])
         x=False
         return TSLA_tweet_sentiments
+
+def get_stock_data(ticker:str, date:str="2021-09-30", days_around:int=7) -> pd.DataFrame:
+
+    # make sure ticker is in upper case
+    ticker=ticker.upper()
+
+    # TODO: make sure the ticker is valid
+
+    # Define the date
+    date_obj = datetime.strptime(date, '%Y-%m-%d') # format of the date- yyyy-mm-dd
+
+    # Calculate start and end dates
+    start_date = (date_obj - timedelta(days=days_around)).strftime('%Y-%m-%d')
+    end_date = (date_obj + timedelta(days=days_around)).strftime('%Y-%m-%d')
+
+    try:
+        # Download stock data for given ticker
+        ticker_stock_data = yf.download(ticker, start=start_date, end=end_date, interval="1d")
+        return ticker_stock_data
+    except Exception as e:
+        print("Error downloading the data from yfinance. Details: ")
+        print(e)
+        TSLA_stock_prices = pd.read_csv("TSLA 14 days stock price.csv")
+        return TSLA_stock_prices
